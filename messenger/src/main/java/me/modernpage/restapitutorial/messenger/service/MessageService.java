@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.modernpage.restapitutorial.messenger.database.DatabaseClass;
+import me.modernpage.restapitutorial.messenger.exception.DataNotFoundException;
 import me.modernpage.restapitutorial.messenger.model.Message;
 
 public class MessageService {
@@ -21,7 +22,10 @@ public class MessageService {
 	}
 	
 	public Message getMessage(long id) {
-		return messages.get(id);
+		Message message = messages.get(id);
+		if(message == null)
+			throw new DataNotFoundException("message not found with the id: " + id);
+		return message;
 	}
 	
 	public Message addMessage(Message message) {

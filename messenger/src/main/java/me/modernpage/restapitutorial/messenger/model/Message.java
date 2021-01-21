@@ -13,6 +13,7 @@ public class Message {
 	private String message;
 	private Date created;
 	private String author;
+	@XmlTransient
 	private Map<Long, Comment> comments = new HashMap<>();
 	
 	public Message() {}
@@ -48,7 +49,7 @@ public class Message {
 		this.author = author;
 	}
 	
-	@XmlTransient
+	
 	public Map<Long, Comment> getComments() {
 		return comments;
 	}
