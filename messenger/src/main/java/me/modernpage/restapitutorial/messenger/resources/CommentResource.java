@@ -18,6 +18,7 @@ import me.modernpage.restapitutorial.messenger.service.CommentService;
 
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Path("/")
 public class CommentResource {
 
 	private CommentService commentService = new CommentService();
@@ -25,6 +26,12 @@ public class CommentResource {
 	@GET
 	public List<Comment> getAllComments(@PathParam("messageId") long messageId) {
 		return commentService.getAllComments(messageId);
+	}
+	
+	@GET
+	@Path("/{commentId}")
+	public Comment getComment(@PathParam("messageId") long messageId, @PathParam("commentId") long commentId) {
+		return commentService.getComment(messageId, commentId);
 	}
 	
 	@POST

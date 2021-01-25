@@ -1,7 +1,9 @@
 package me.modernpage.restapitutorial.messenger.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,6 +15,7 @@ public class Message {
 	private String message;
 	private Date created;
 	private String author;
+	private List<Link> links = new ArrayList<>();
 	@XmlTransient
 	private Map<Long, Comment> comments = new HashMap<>();
 	
@@ -49,13 +52,17 @@ public class Message {
 		this.author = author;
 	}
 	
-	
 	public Map<Long, Comment> getComments() {
 		return comments;
 	}
 	public void setComments(Map<Long, Comment> comments) {
 		this.comments = comments;
 	}
-	
+	public List<Link> getLinks() {
+		return links;
+	}
+	public void setLinks(List<Link> links) {
+		this.links = links;
+	}
 	
 }

@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import me.modernpage.restapitutorial.messenger.model.Link;
 import me.modernpage.restapitutorial.messenger.model.Message;
 import me.modernpage.restapitutorial.messenger.resources.beans.MessageFIlterBean;
 import me.modernpage.restapitutorial.messenger.service.MessageService;
@@ -35,7 +36,25 @@ public class MessageResource {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
-	public GenericEntity<List<Message>> getMessages(@BeanParam MessageFIlterBean filter) {
+	public GenericEntity<List<Message>> getXMLMessages(@BeanParam MessageFIlterBean filter) {
+		System.out.println("getMessages in XML");
+		if(filter.getYear()>0) {
+			GenericEntity<List<Message>> entity = new GenericEntity<List<Message>>(service.getAllMessagesforYear(filter.getYear())){};
+			return entity;
+		}
+		if(filter.getStart() > 0 && filter.getSize() > 0) {
+			GenericEntity<List<Message>> entity = new GenericEntity<List<Message>>(service.getAllMessagePeginated(filter.getStart()-1, filter.getSize())){};
+			return entity;
+		}
+		
+		GenericEntity<List<Message>> entity = new GenericEntity<List<Message>>(service.getAllMessages()){};
+		return entity;
+	}
+	
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public GenericEntity<List<Message>> getJSONMessages(@BeanParam MessageFIlterBean filter) {
+		System.out.println("getMessages in JSON");
 		if(filter.getYear()>0) {
 			GenericEntity<List<Message>> entity = new GenericEntity<List<Message>>(service.getAllMessagesforYear(filter.getYear())){};
 			return entity;
@@ -52,8 +71,19 @@ public class MessageResource {
 	@GET
 	@Path("/{messageId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message getMessage(@PathParam("messageId") long messageId) {
-		return service.getMessage(messageId);
+	public Message getMessage(@Context UriInfo uriInfo, @PathParam("messageId") long messageId) {
+		Message message = service.getMessage(messageId);
+		List<Link> links = new ArrayList<>();
+		links.add(new Link(uriInfo.getBaseUriBuilder().path(MessageResource.class).path(Long.toString(message.getId())).toString(), "self"));
+		links.add(new Link(uriInfo.getBaseUriBuilder().path(ProfileResource.class).path(message.getAuthor()).toString(), "profile"));
+		links.add(new Link(uriInfo.getBaseUriBuilder()
+								.path(MessageResource.class)
+								.path(MessageResource.class, "getCommentResource")
+								.path(CommentResource.class)
+								.resolveTemplate("messageId", message.getId()).toString(), "comments"));
+		
+		message.setLinks(links);
+		return message;
 	}
 	
 	@POST
@@ -87,6 +117,7 @@ public class MessageResource {
 	
 	@Path("/{messageId}/comments")
 	public CommentResource getCommentResource() {
+		System.out.println("getComment called");
 		return new CommentResource();
 	}
 }

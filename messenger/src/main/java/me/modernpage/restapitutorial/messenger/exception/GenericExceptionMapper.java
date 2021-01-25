@@ -9,7 +9,7 @@ import javax.ws.rs.ext.Provider;
 
 import me.modernpage.restapitutorial.messenger.model.ErrorMessage;
 
-@Provider
+
 public class GenericExceptionMapper implements ExceptionMapper<Throwable> {
 	
 	@Context 

@@ -4,8 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+
 import me.modernpage.restapitutorial.messenger.database.DatabaseClass;
 import me.modernpage.restapitutorial.messenger.model.Comment;
+import me.modernpage.restapitutorial.messenger.model.ErrorMessage;
 import me.modernpage.restapitutorial.messenger.model.Message;
 
 public class CommentService {
@@ -21,7 +27,21 @@ public class CommentService {
 	}
 	
 	public Comment getComment(long messageId, long commentId) {
-		return messages.get(messageId).getComments().get(commentId);
+		Message message = messages.get(messageId);
+		if(message == null) {
+			ErrorMessage errorMessage = new ErrorMessage("Not Found", 404, "https://modernpage.me");
+			Response response = Response.status(Status.INTERNAL_SERVER_ERROR)
+					.entity(errorMessage)
+					.type("application/json")
+					.build();
+			throw new WebApplicationException(response);
+		}
+		Comment comment = message.getComments().get(commentId);
+		
+		if(comment == null) {
+			throw new NotFoundException();
+		}
+		return comment;
 	}
 	
 	public Comment addComment(long messageId, Comment comment) {
